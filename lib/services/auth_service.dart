@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../database/app_database.dart';
 import '../models/app_user.dart';
+import '../repositories/login_history_repository.dart';
 import '../repositories/user_repository.dart';
 
 class AuthService {
@@ -9,10 +10,21 @@ class AuthService {
   static AppUser? currentUser;
 
   static UserRepository _users = UserRepository(AppDatabase.instance);
+  static LoginHistoryRepository _loginHistory = LoginHistoryRepository(
+    AppDatabase.instance,
+  );
 
   /// Allows tests to inject a mock [UserRepository] instead of the real DB one.
   @visibleForTesting
   static set usersRepositoryForTesting(UserRepository repo) => _users = repo;
+
+  /// Allows tests to inject a mock [LoginHistoryRepository].
+  @visibleForTesting
+  static set loginHistoryRepositoryForTesting(LoginHistoryRepository repo) =>
+      _loginHistory = repo;
+
+  /// Returns the login history repository for external use.
+  static LoginHistoryRepository get loginHistoryRepository => _loginHistory;
 
   static Future<bool> register({
     required String name,
@@ -37,6 +49,13 @@ class AuthService {
 
     currentUser = user;
     isLoggedIn = true;
+
+    // Record the login for the newly registered user
+    await _loginHistory.recordLogin(
+      userId: user.id,
+      deviceInfo: _getDeviceInfo(),
+    );
+
     return true;
   }
 
@@ -51,7 +70,21 @@ class AuthService {
 
     currentUser = user;
     isLoggedIn = true;
+
+    // Record the login
+    await _loginHistory.recordLogin(
+      userId: user.id,
+      deviceInfo: _getDeviceInfo(),
+    );
+
     return true;
+  }
+
+  /// Gets basic device info string for logging purposes.
+  static String _getDeviceInfo() {
+    // In a real app, you'd use device_info_plus package
+    // For now, return a placeholder based on the platform
+    return 'Flutter App';
   }
 
   static Future<String?> changePassword({

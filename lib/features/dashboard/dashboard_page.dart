@@ -227,8 +227,9 @@ class _DashboardPageState extends State<DashboardPage> {
         onTap: (i) {
           setState(() => selectedIndex = i);
 
-          // For now: keep dashboard as main, route to settings when tapped
+          // Navigate to sub-pages
           if (i == 1) context.push('/diary');
+          if (i == 2) context.push('/history');
           if (i == 3) context.push('/settings');
         },
       ),

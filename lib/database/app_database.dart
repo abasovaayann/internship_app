@@ -12,7 +12,7 @@ class AppDatabase {
   AppDatabase.forTesting(Database db) : _db = db;
 
   static const _dbName = 'internship_app.db';
-  static const _dbVersion = 1;
+  static const _dbVersion = 2;
 
   Database? _db;
 
@@ -55,6 +55,33 @@ class AppDatabase {
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
           );
         ''');
+
+        // Login history tracking table
+        await db.execute('''
+          CREATE TABLE login_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            login_time TEXT NOT NULL,
+            device_info TEXT,
+            ip_address TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+          );
+        ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        // Migration from version 1 to 2: add login_history table
+        if (oldVersion < 2) {
+          await db.execute('''
+            CREATE TABLE login_history (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              user_id INTEGER NOT NULL,
+              login_time TEXT NOT NULL,
+              device_info TEXT,
+              ip_address TEXT,
+              FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+          ''');
+        }
       },
     );
   }
