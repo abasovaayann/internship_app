@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../database/app_database.dart';
 import '../../models/activity_stats.dart';
-import '../../models/login_history_model.dart';
+import '../../models/login_history.dart';
 import '../../repositories/diary_repository.dart';
 import '../../services/auth_service.dart';
 
@@ -25,7 +25,7 @@ class _HistoryPageState extends State<HistoryPage>
   late TabController _tabController;
 
   bool _loading = true;
-  List<LoginHistoryModel> _loginHistory = const [];
+  List<LoginHistory> _loginHistory = const [];
   ActivityStats _activityStats = ActivityStats.empty;
 
   @override
@@ -59,7 +59,7 @@ class _HistoryPageState extends State<HistoryPage>
 
     if (!mounted) return;
     setState(() {
-      _loginHistory = results[0] as List<LoginHistoryModel>;
+      _loginHistory = results[0] as List<LoginHistory>;
       _activityStats = results[1] as ActivityStats;
       _loading = false;
     });

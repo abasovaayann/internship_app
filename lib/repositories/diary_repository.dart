@@ -1,12 +1,12 @@
 import '../database/app_database.dart';
 import '../models/activity_stats.dart';
-import '../models/diary_entry_model.dart';
+import '../models/diary_entry.dart';
 
 class DiaryRepository {
   final AppDatabase _database;
   DiaryRepository(this._database);
 
-  Future<List<DiaryEntryModel>> listByUser(int userId) async {
+  Future<List<DiaryEntry>> listByUser(int userId) async {
     final db = await _database.db;
     final rows = await db.query(
       'diary_entries',
@@ -16,7 +16,7 @@ class DiaryRepository {
     );
 
     return rows.map((r) {
-      return DiaryEntryModel(
+      return DiaryEntry(
         id: r['id'] as int,
         userId: r['user_id'] as int,
         title: r['title'] as String,
@@ -101,9 +101,7 @@ class DiaryRepository {
   }
 
   /// Helper to calculate current and longest writing streaks.
-  ({int current, int longest}) _calculateStreaks(
-    List<DiaryEntryModel> entries,
-  ) {
+  ({int current, int longest}) _calculateStreaks(List<DiaryEntry> entries) {
     if (entries.isEmpty) return (current: 0, longest: 0);
 
     // Get unique dates (normalized to start of day)

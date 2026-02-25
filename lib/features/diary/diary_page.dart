@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../services/auth_service.dart';
 import '../../database/app_database.dart';
-import '../../models/diary_entry_model.dart';
+import '../../models/diary_entry.dart';
 import '../../repositories/diary_repository.dart';
 
 class DiaryPage extends StatefulWidget {
@@ -25,7 +25,7 @@ class _DiaryPageState extends State<DiaryPage> {
   final DiaryRepository _repo = DiaryRepository(AppDatabase.instance);
 
   bool _loading = true;
-  List<DiaryEntryModel> _entries = const [];
+  List<DiaryEntry> _entries = const [];
 
   @override
   void initState() {
@@ -236,7 +236,7 @@ class _DiaryPageState extends State<DiaryPage> {
 
   // ---------- View entry dialog ----------
 
-  Future<void> _openEntryDialog(DiaryEntryModel e) async {
+  Future<void> _openEntryDialog(DiaryEntry e) async {
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
@@ -287,7 +287,7 @@ class _DiaryPageState extends State<DiaryPage> {
 
   // ---------- Delete ----------
 
-  Future<void> _confirmDelete(DiaryEntryModel e) async {
+  Future<void> _confirmDelete(DiaryEntry e) async {
     final messenger = ScaffoldMessenger.of(context);
 
     final confirmed = await showDialog<bool>(

@@ -1,11 +1,11 @@
-class LoginHistoryModel {
+class LoginHistory {
   final int id;
   final int userId;
   final DateTime loginTime;
   final String? deviceInfo;
   final String? ipAddress;
 
-  const LoginHistoryModel({
+  const LoginHistory({
     required this.id,
     required this.userId,
     required this.loginTime,

@@ -1,5 +1,5 @@
 import '../database/app_database.dart';
-import '../models/login_history_model.dart';
+import '../models/login_history.dart';
 
 class LoginHistoryRepository {
   final AppDatabase _database;
@@ -22,7 +22,7 @@ class LoginHistoryRepository {
 
   /// Returns the login history for a user, ordered by most recent first.
   /// Optionally limit the number of results.
-  Future<List<LoginHistoryModel>> getHistory(int userId, {int? limit}) async {
+  Future<List<LoginHistory>> getHistory(int userId, {int? limit}) async {
     final db = await _database.db;
     final rows = await db.query(
       'login_history',
@@ -33,7 +33,7 @@ class LoginHistoryRepository {
     );
 
     return rows.map((r) {
-      return LoginHistoryModel(
+      return LoginHistory(
         id: r['id'] as int,
         userId: r['user_id'] as int,
         loginTime: DateTime.parse(r['login_time'] as String),

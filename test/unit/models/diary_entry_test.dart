@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:internship_app/models/diary_entry_model.dart';
+import 'package:internship_app/models/diary_entry.dart';
 
 void main() {
-  group('DiaryEntryModel', () {
+  group('DiaryEntry', () {
     final now = DateTime(2025, 6, 1, 12, 30);
 
     test('stores all fields correctly', () {
-      final entry = DiaryEntryModel(
+      final entry = DiaryEntry(
         id: 42,
         userId: 7,
         title: 'Test Entry',
@@ -23,7 +23,7 @@ void main() {
 
     test('createdAt preserves the exact DateTime', () {
       final dt = DateTime(2024, 1, 15, 8, 0, 0);
-      final entry = DiaryEntryModel(
+      final entry = DiaryEntry(
         id: 1,
         userId: 1,
         title: 'x',
