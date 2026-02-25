@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/auth/auth_service.dart';
-import '../../core/theme/app_colors.dart';
+import '../../services/auth_service.dart';
+import '../../theme/app_colors.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -140,9 +140,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: loading
                         ? const CircularProgressIndicator(strokeWidth: 2)
                         : const Text(
-                      'Register',
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
+                            'Register',
+                            style: TextStyle(fontWeight: FontWeight.w800),
+                          ),
                   ),
                 ),
 
@@ -194,12 +194,13 @@ class _RegisterPageState extends State<RegisterPage> {
               hintText: hint,
               hintStyle: TextStyle(color: AppColors.textMuted),
               border: InputBorder.none,
-              contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
               suffixIcon: trailing,
             ),
-            validator: (v) =>
-            (v == null || v.isEmpty) ? 'Required' : null,
+            validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
           ),
         ),
       ],

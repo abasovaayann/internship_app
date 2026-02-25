@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:internship_app/core/auth/auth_service.dart';
-import 'package:internship_app/core/models/user_model.dart';
-import 'package:internship_app/core/repositories/user_repository.dart';
+import 'package:internship_app/services/auth_service.dart';
+import 'package:internship_app/models/app_user.dart';
+import 'package:internship_app/repositories/user_repository.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 

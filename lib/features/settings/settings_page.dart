@@ -1,8 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/auth/auth_service.dart';
-import '../../core/models/user_model.dart';
+import '../../services/auth_service.dart';
+import '../../models/app_user.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

@@ -1,9 +1,11 @@
+// ignore_for_file: unnecessary_underscores
+
 import 'package:flutter/material.dart';
 
-import '../../core/auth/auth_service.dart';
-import '../../core/database/app_database.dart';
-import '../../core/models/diary_entry_model.dart';
-import '../../core/repositories/diary_repository.dart';
+import '../../services/auth_service.dart';
+import '../../database/app_database.dart';
+import '../../models/diary_entry_model.dart';
+import '../../repositories/diary_repository.dart';
 
 class DiaryPage extends StatefulWidget {
   const DiaryPage({super.key});

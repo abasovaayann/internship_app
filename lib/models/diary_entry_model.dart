@@ -11,5 +11,5 @@ class DiaryEntryModel {
     required this.title,
     required this.content,
     required this.createdAt,
-});
+  });
 }

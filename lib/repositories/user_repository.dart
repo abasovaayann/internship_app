@@ -1,5 +1,5 @@
 import '../database/app_database.dart';
-import '../models/user_model.dart';
+import '../models/app_user.dart';
 
 class UserRepository {
   final AppDatabase _database;
@@ -90,7 +90,6 @@ class UserRepository {
 
     return count == 1;
   }
-
 
   Future<bool> updateProfile({
     required int userId,

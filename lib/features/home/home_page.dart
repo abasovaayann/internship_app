@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/auth/auth_service.dart';
+import '../../services/auth_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -23,9 +23,7 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: const Center(
-        child: Text('Welcome 👋'),
-      ),
+      body: const Center(child: Text('Welcome 👋')),
     );
   }
 }

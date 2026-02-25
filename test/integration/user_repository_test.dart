@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:internship_app/core/database/app_database.dart';
-import 'package:internship_app/core/repositories/user_repository.dart';
+import 'package:internship_app/database/app_database.dart';
+import 'package:internship_app/repositories/user_repository.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 /// Opens a fresh in-memory SQLite DB with the same schema as [AppDatabase].

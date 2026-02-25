@@ -1,7 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/auth/auth_service.dart';
+import '../../services/auth_service.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -663,9 +665,7 @@ class _CheckInSlider extends StatelessWidget {
   final ValueChanged<double> onChanged;
 
   static const primary = Color(0xFF13EC5B);
-  static const backgroundDark = Color(0xFF102216);
   static const borderGreen = Color(0xFF326744);
-  static const textMuted = Color(0xFF92C9A4);
 
   @override
   Widget build(BuildContext context) {

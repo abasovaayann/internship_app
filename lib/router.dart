@@ -1,6 +1,8 @@
+// ignore_for_file: unnecessary_underscores
+
 import 'package:go_router/go_router.dart';
 
-import 'core/auth/auth_service.dart';
+import 'services/auth_service.dart';
 import 'features/auth/login_page.dart';
 import 'features/auth/register_page.dart';
 import 'features/dashboard/dashboard_page.dart';

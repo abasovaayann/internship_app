@@ -11,12 +11,7 @@ class AppUser {
     required this.university,
   });
 
-  AppUser copyWith({
-    int? id,
-    String? name,
-    String? email,
-    String? university,
-  }) {
+  AppUser copyWith({int? id, String? name, String? email, String? university}) {
     return AppUser(
       id: id ?? this.id,
       name: name ?? this.name,

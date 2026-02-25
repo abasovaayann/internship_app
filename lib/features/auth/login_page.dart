@@ -1,8 +1,10 @@
+// ignore_for_file: deprecated_member_use, sort_child_properties_last
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/auth/auth_service.dart';
+import '../../theme/app_colors.dart';
+import '../../services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

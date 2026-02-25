@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../database/app_database.dart';
-import '../models/user_model.dart';
+import '../models/app_user.dart';
 import '../repositories/user_repository.dart';
 
 class AuthService {

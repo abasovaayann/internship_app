@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:internship_app/core/diary/diary_store.dart';
+import 'package:internship_app/services/diary_store.dart';
 
 void main() {
   setUp(() {

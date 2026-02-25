@@ -1,8 +1,10 @@
+// ignore_for_file: unnecessary_underscores
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:internship_app/core/auth/auth_service.dart';
-import 'package:internship_app/core/models/user_model.dart';
+import 'package:internship_app/services/auth_service.dart';
+import 'package:internship_app/models/app_user.dart';
 import 'package:internship_app/features/dashboard/dashboard_page.dart';
 
 /// A minimal router for testing DashboardPage.

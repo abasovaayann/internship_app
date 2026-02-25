@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:internship_app/core/models/user_model.dart';
+import 'package:internship_app/models/app_user.dart';
 
 void main() {
   group('AppUser', () {
