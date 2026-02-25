@@ -1,16 +1,21 @@
-# internship_app
+# Internship App
 
-A new Flutter project.
+A mobile application demo for university students' mental health and wellness tracking.
+
+## Features
+
+- **Diary** - Write and manage personal journal entries
+- **History & Analytics** - View login history and activity statistics (most active days/times, writing streaks)
+- **Daily Mood Tracker** - Check in with your mood, sleep quality, and energy levels
+
+## Tech Stack
+
+- Flutter
+- SQLite (sqflite)
+- GoRouter for navigation
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Make sure you have Flutter installed
+2. Run `flutter pub get` to install dependencies
+3. Run `flutter run` to start the app
