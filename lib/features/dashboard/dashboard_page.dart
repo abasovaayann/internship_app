@@ -23,6 +23,8 @@ class _DashboardPageState extends State<DashboardPage> {
   int selectedIndex = 0;
 
   // Check-in state (0.0 to 1.0)
+  // TODO: Future work - persist check-in data to a `check_ins` table so values
+  // are not lost when the app is closed. For now, these are in-memory only.
   double _moodLevel = 0.70;
   double _sleepQuality = 0.85;
   double _energyLevel = 0.45;

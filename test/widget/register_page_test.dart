@@ -24,12 +24,12 @@ Widget _wrap() => MaterialApp.router(routerConfig: _testRouter());
 
 void main() {
   group('RegisterPage — widget tests', () {
-    testWidgets('renders all four input fields', (tester) async {
+    testWidgets('renders all five input fields', (tester) async {
       await tester.pumpWidget(_wrap());
       await tester.pumpAndSettle();
 
-      // Full Name, University, Email, Password = 4 TextFormFields
-      expect(find.byType(TextFormField), findsNWidgets(4));
+      // Full Name, University, Email, Password, Confirm Password = 5 TextFormFields
+      expect(find.byType(TextFormField), findsNWidgets(5));
       expect(find.text('Create Account'), findsOneWidget);
     });
 
@@ -39,11 +39,18 @@ void main() {
       await tester.pumpWidget(_wrap());
       await tester.pumpAndSettle();
 
+      // Scroll to bring Register button into view
+      await tester.drag(
+        find.byType(SingleChildScrollView),
+        const Offset(0, -200),
+      );
+      await tester.pumpAndSettle();
+
       await tester.tap(find.text('Register'));
       await tester.pumpAndSettle();
 
-      // 4 fields × 'Required'
-      expect(find.text('Required'), findsNWidgets(4));
+      // 5 fields × 'Required'
+      expect(find.text('Required'), findsNWidgets(5));
     });
 
     testWidgets('shows a link back to the login page', (tester) async {

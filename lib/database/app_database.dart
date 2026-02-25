@@ -32,6 +32,8 @@ class AppDatabase {
         await db.execute('PRAGMA foreign_keys = ON;');
       },
       onCreate: (db, version) async {
+        // NOTE: Password is stored as plain text for this demo/school project.
+        // In a production app, passwords should be hashed (e.g., bcrypt, argon2).
         await db.execute('''
           CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

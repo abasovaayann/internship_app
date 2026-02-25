@@ -18,9 +18,11 @@ class _RegisterPageState extends State<RegisterPage> {
   final universityController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
   bool loading = false;
   bool obscure = true;
+  bool obscureConfirm = true;
   String? error;
 
   @override
@@ -29,6 +31,7 @@ class _RegisterPageState extends State<RegisterPage> {
     universityController.dispose();
     emailController.dispose();
     passwordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -44,7 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
       university: universityController.text.trim(),
       email: emailController.text.trim(),
       password: passwordController.text,
-      confirmPassword: passwordController.text,
+      confirmPassword: confirmPasswordController.text,
     );
 
     if (!mounted) return;
@@ -115,6 +118,30 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
 
+                const SizedBox(height: 16),
+
+                _field(
+                  label: 'Confirm Password',
+                  controller: confirmPasswordController,
+                  hint: '••••••••',
+                  obscure: obscureConfirm,
+                  trailing: IconButton(
+                    icon: Icon(
+                      obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                      color: AppColors.textMuted,
+                    ),
+                    onPressed: () =>
+                        setState(() => obscureConfirm = !obscureConfirm),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Required';
+                    if (v != passwordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
+                ),
+
                 if (error != null) ...[
                   const SizedBox(height: 12),
                   Text(
@@ -167,6 +194,7 @@ class _RegisterPageState extends State<RegisterPage> {
     TextInputType keyboard = TextInputType.text,
     bool obscure = false,
     Widget? trailing,
+    String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,7 +228,9 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               suffixIcon: trailing,
             ),
-            validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+            validator:
+                validator ??
+                (v) => (v == null || v.isEmpty) ? 'Required' : null,
           ),
         ),
       ],
