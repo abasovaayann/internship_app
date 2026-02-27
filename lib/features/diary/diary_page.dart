@@ -643,3 +643,155 @@ class _NewEntrySheetContent extends StatelessWidget {
     );
   }
 }
+
+class _EditEntrySheetContent extends StatelessWidget {
+  const _EditEntrySheetContent({
+    required this.titleCtrl,
+    required this.contentCtrl,
+  });
+
+  final TextEditingController titleCtrl;
+  final TextEditingController contentCtrl;
+
+  static const primary = Color(0xFF13EC5B);
+  static const backgroundDark = Color(0xFF102216);
+  static const borderGreen = Color(0xFF326744);
+  static const textMuted = Color(0xFF92C9A4);
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: borderGreen,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'Edit Diary Entry',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 14),
+              _buildField(
+                label: 'Title',
+                controller: titleCtrl,
+                hint: 'e.g., Today was...',
+              ),
+              const SizedBox(height: 12),
+              _buildField(
+                label: 'Your thoughts',
+                controller: contentCtrl,
+                hint: 'Write freely…',
+                maxLines: 6,
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: borderGreen),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (contentCtrl.text.trim().isEmpty) {
+                          Navigator.of(context).pop(null);
+                          return;
+                        }
+                        Navigator.of(context).pop(true);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primary,
+                        foregroundColor: backgroundDark,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text(
+                        'Update',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildField({
+    required String label,
+    required TextEditingController controller,
+    required String hint,
+    int maxLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          decoration: BoxDecoration(
+            color: backgroundDark,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: borderGreen),
+          ),
+          child: TextField(
+            controller: controller,
+            maxLines: maxLines,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 14,
+              ),
+              hintText: hint,
+              hintStyle: const TextStyle(color: textMuted),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
