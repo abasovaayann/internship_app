@@ -12,7 +12,7 @@ class AppDatabase {
   AppDatabase.forTesting(Database db) : _db = db;
 
   static const _dbName = 'internship_app.db';
-  static const _dbVersion = 2;
+  static const _dbVersion = 3;
 
   Database? _db;
 
@@ -67,6 +67,19 @@ class AppDatabase {
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
           );
         ''');
+
+        // Daily check-in table for mood, sleep, energy tracking
+        await db.execute('''
+          CREATE TABLE check_ins (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            mood_level REAL NOT NULL,
+            sleep_quality REAL NOT NULL,
+            energy_level REAL NOT NULL,
+            date TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+          );
+        ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         // Migration from version 1 to 2: add login_history table
@@ -78,6 +91,20 @@ class AppDatabase {
               login_time TEXT NOT NULL,
               device_info TEXT,
               ip_address TEXT,
+              FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+          ''');
+        }
+        // Migration from version 2 to 3: add check_ins table
+        if (oldVersion < 3) {
+          await db.execute('''
+            CREATE TABLE check_ins (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              user_id INTEGER NOT NULL,
+              mood_level REAL NOT NULL,
+              sleep_quality REAL NOT NULL,
+              energy_level REAL NOT NULL,
+              date TEXT NOT NULL,
               FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             );
           ''');

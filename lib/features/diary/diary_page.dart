@@ -274,6 +274,16 @@ class _DiaryPageState extends State<DiaryPage> {
         ),
         actions: [
           TextButton(
+            onPressed: () {
+              Navigator.of(dialogCtx).pop();
+              _openEditEntrySheet(e);
+            },
+            child: const Text(
+              'Edit',
+              style: TextStyle(color: textMuted, fontWeight: FontWeight.w900),
+            ),
+          ),
+          TextButton(
             onPressed: () => Navigator.of(dialogCtx).pop(),
             child: const Text(
               'Close',
@@ -283,6 +293,65 @@ class _DiaryPageState extends State<DiaryPage> {
         ],
       ),
     );
+  }
+
+  // ---------- Edit entry (Bottom Sheet) ----------
+
+  Future<void> _openEditEntrySheet(DiaryEntry entry) async {
+    final messenger = ScaffoldMessenger.of(context);
+
+    final titleCtrl = TextEditingController(text: entry.title);
+    final contentCtrl = TextEditingController(text: entry.content);
+
+    final result = await showModalBottomSheet<bool?>(
+      context: context,
+      isScrollControlled: true,
+      useRootNavigator: true,
+      backgroundColor: surfaceDark,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      builder: (sheetCtx) {
+        return _EditEntrySheetContent(
+          titleCtrl: titleCtrl,
+          contentCtrl: contentCtrl,
+        );
+      },
+    );
+
+    if (result == null && mounted) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Please write something first.')),
+      );
+      titleCtrl.dispose();
+      contentCtrl.dispose();
+      return;
+    }
+
+    if (result == true && mounted) {
+      try {
+        await _repo.update(
+          id: entry.id,
+          title: titleCtrl.text.trim().isEmpty
+              ? 'Untitled'
+              : titleCtrl.text.trim(),
+          content: contentCtrl.text.trim(),
+        );
+
+        if (!mounted) return;
+
+        await _load();
+        if (!mounted) return;
+
+        messenger.showSnackBar(const SnackBar(content: Text('Entry updated')));
+      } catch (e) {
+        if (!mounted) return;
+        messenger.showSnackBar(SnackBar(content: Text('Failed to update: $e')));
+      }
+    }
+
+    titleCtrl.dispose();
+    contentCtrl.dispose();
   }
 
   // ---------- Delete ----------

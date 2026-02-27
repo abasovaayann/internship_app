@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../database/app_database.dart';
+import '../../repositories/check_in_repository.dart';
 import '../../services/auth_service.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -20,14 +22,63 @@ class _DashboardPageState extends State<DashboardPage> {
   static const borderGreen = Color(0xFF326744);
   static const textMuted = Color(0xFF92C9A4);
 
+  final CheckInRepository _checkInRepo = CheckInRepository(
+    AppDatabase.instance,
+  );
+
   int selectedIndex = 0;
+  bool _loading = true;
 
   // Check-in state (0.0 to 1.0)
-  // TODO: Future work - persist check-in data to a `check_ins` table so values
-  // are not lost when the app is closed. For now, these are in-memory only.
-  double _moodLevel = 0.70;
-  double _sleepQuality = 0.85;
-  double _energyLevel = 0.45;
+  double _moodLevel = 0.50;
+  double _sleepQuality = 0.50;
+  double _energyLevel = 0.50;
+
+  // Weekly mood trend data
+  List<double> _weeklyMoods = [0, 0, 0, 0, 0, 0, 0];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCheckIn();
+  }
+
+  Future<void> _loadCheckIn() async {
+    final user = AuthService.currentUser;
+    if (user == null) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
+
+    // Load today's check-in
+    final todayCheckIn = await _checkInRepo.getToday(user.id);
+    if (todayCheckIn != null) {
+      _moodLevel = todayCheckIn.moodLevel;
+      _sleepQuality = todayCheckIn.sleepQuality;
+      _energyLevel = todayCheckIn.energyLevel;
+    }
+
+    // Load weekly trend
+    final weeklyData = await _checkInRepo.getWeeklyMoodTrend(user.id);
+    _weeklyMoods = List.generate(7, (i) => weeklyData[i + 1] ?? 0.0);
+
+    if (mounted) setState(() => _loading = false);
+  }
+
+  Future<void> _saveCheckIn(double mood, double sleep, double energy) async {
+    final user = AuthService.currentUser;
+    if (user == null) return;
+
+    await _checkInRepo.save(
+      userId: user.id,
+      moodLevel: mood,
+      sleepQuality: sleep,
+      energyLevel: energy,
+    );
+
+    // Reload to update weekly trends
+    await _loadCheckIn();
+  }
 
   String _formatDay(DateTime date) {
     const days = [
@@ -134,16 +185,22 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     setState(() {
                       _moodLevel = tempMood;
                       _sleepQuality = tempSleep;
                       _energyLevel = tempEnergy;
                     });
                     Navigator.of(context).pop();
-                    ScaffoldMessenger.of(this.context).showSnackBar(
-                      const SnackBar(content: Text('Check-in updated!')),
-                    );
+
+                    // Save to database
+                    await _saveCheckIn(tempMood, tempSleep, tempEnergy);
+
+                    if (mounted) {
+                      ScaffoldMessenger.of(this.context).showSnackBar(
+                        const SnackBar(content: Text('Check-in saved!')),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primary,
@@ -234,168 +291,181 @@ class _DashboardPageState extends State<DashboardPage> {
         },
       ),
 
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 120),
-          children: [
-            const SizedBox(height: 6),
-
-            Text(
-              'Hello, ${user.name}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 26,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'How are you feeling today?',
-              style: TextStyle(color: textMuted, fontWeight: FontWeight.w700),
-            ),
-
-            const SizedBox(height: 18),
-
-            // AI Insight card
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: surfaceDark,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: borderGreen),
-                boxShadow: [
-                  BoxShadow(
-                    color: primary.withOpacity(0.12),
-                    blurRadius: 18,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: _loading
+          ? const Center(child: CircularProgressIndicator(color: primary))
+          : SafeArea(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 120),
                 children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: primary.withOpacity(0.18),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: borderGreen),
+                  const SizedBox(height: 6),
+
+                  Text(
+                    'Hello, ${user.name}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w900,
                     ),
-                    child: const Icon(Icons.auto_awesome, color: primary),
                   ),
-                  const SizedBox(width: 12),
-                  const Expanded(
-                    child: Column(
+                  const SizedBox(height: 4),
+                  Text(
+                    'How are you feeling today?',
+                    style: TextStyle(
+                      color: textMuted,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // AI Insight card
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: surfaceDark,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: borderGreen),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primary.withOpacity(0.12),
+                          blurRadius: 18,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'AI Insight',
-                          style: TextStyle(
-                            color: Color(0xFF92C9A4),
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.2,
-                            fontSize: 12,
+                        Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: primary.withOpacity(0.18),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: borderGreen),
                           ),
+                          child: const Icon(Icons.auto_awesome, color: primary),
                         ),
-                        SizedBox(height: 6),
-                        Text(
-                          '“Your sleep quality improved this week. Keep a consistent bedtime routine.”',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            height: 1.25,
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'AI Insight',
+                                style: TextStyle(
+                                  color: Color(0xFF92C9A4),
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.2,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                '“Your sleep quality improved this week. Keep a consistent bedtime routine.”',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.25,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
+
+                  const SizedBox(height: 18),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Daily Check-in',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      Flexible(
+                        child: Text(
+                          _formatDay(DateTime.now()),
+                          style: TextStyle(
+                            color: textMuted,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  _CheckInCard(
+                    items: [
+                      _Metric(
+                        icon: Icons.sentiment_satisfied,
+                        label: 'Mood Level',
+                        value: _moodLevel,
+                      ),
+                      _Metric(
+                        icon: Icons.nights_stay,
+                        label: 'Sleep Quality',
+                        value: _sleepQuality,
+                      ),
+                      _Metric(
+                        icon: Icons.bolt,
+                        label: 'Energy Level',
+                        value: _energyLevel,
+                      ),
+                    ],
+                    onUpdate: _showCheckInDialog,
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Weekly Trends',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      Text(
+                        'Mood score',
+                        style: TextStyle(
+                          color: primary,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 12,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  _TrendsCard(
+                    values: _weeklyMoods,
+                    labels: const [
+                      'MON',
+                      'TUE',
+                      'WED',
+                      'THU',
+                      'FRI',
+                      'SAT',
+                      'SUN',
+                    ],
+                  ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 18),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Daily Check-in',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                Flexible(
-                  child: Text(
-                    _formatDay(DateTime.now()),
-                    style: TextStyle(
-                      color: textMuted,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-
-            _CheckInCard(
-              items: [
-                _Metric(
-                  icon: Icons.sentiment_satisfied,
-                  label: 'Mood Level',
-                  value: _moodLevel,
-                ),
-                _Metric(
-                  icon: Icons.nights_stay,
-                  label: 'Sleep Quality',
-                  value: _sleepQuality,
-                ),
-                _Metric(
-                  icon: Icons.bolt,
-                  label: 'Energy Level',
-                  value: _energyLevel,
-                ),
-              ],
-              onUpdate: _showCheckInDialog,
-            ),
-
-            const SizedBox(height: 18),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Weekly Trends',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                Text(
-                  'Mood score',
-                  style: TextStyle(
-                    color: primary,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 12,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-
-            _TrendsCard(
-              values: const [0.40, 0.60, 0.55, 0.85, 0.70, 0.50, 0.45],
-              labels: const ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

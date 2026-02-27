@@ -45,6 +45,23 @@ class DiaryRepository {
     await db.delete('diary_entries', where: 'id = ?', whereArgs: [id]);
   }
 
+  Future<void> update({
+    required int id,
+    required String title,
+    required String content,
+  }) async {
+    final db = await _database.db;
+    await db.update(
+      'diary_entries',
+      {
+        'title': title.trim().isEmpty ? 'Untitled' : title.trim(),
+        'content': content.trim(),
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   /// Calculates activity statistics for a user's diary entries.
   Future<ActivityStats> getActivityStats(int userId) async {
     final entries = await listByUser(userId);
