@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../database/app_database.dart';
+import '../../repositories/check_in_repository.dart';
+import '../../repositories/diary_repository.dart';
 import '../../services/auth_service.dart';
 import '../../models/app_user.dart';
 
@@ -74,6 +77,86 @@ class _SettingsPageState extends State<SettingsPage> {
   void _logout() {
     AuthService.logout();
     context.go('/login');
+  }
+
+  Future<void> _seedTestData() async {
+    final user = AuthService.currentUser;
+    if (user == null) return;
+
+    final db = AppDatabase.instance;
+    final diaryRepo = DiaryRepository(db);
+    final checkInRepo = CheckInRepository(db);
+
+    // Test diary entries for various dates
+    final diaryData = [
+      (
+        DateTime(2026, 2, 20),
+        'Feeling reflective',
+        'Started thinking about my internship goals. Feeling motivated!',
+      ),
+      (
+        DateTime(2026, 2, 22),
+        'Good progress',
+        'Made good progress on my project today. Learning a lot.',
+      ),
+      (
+        DateTime(2026, 2, 25),
+        'Midweek check',
+        'Halfway through the week. Focusing on balance.',
+      ),
+      (
+        DateTime(2026, 2, 27),
+        'Weekend plans',
+        'Planning to rest and recharge this weekend.',
+      ),
+      (
+        DateTime(2026, 3, 1),
+        'New month!',
+        'Excited for March. Setting new goals for the month.',
+      ),
+    ];
+
+    // Test check-ins for the last 7 days
+    final now = DateTime.now();
+    final checkInData = [
+      (now.subtract(const Duration(days: 6)), 0.6, 0.7, 0.5),
+      (now.subtract(const Duration(days: 5)), 0.7, 0.6, 0.6),
+      (now.subtract(const Duration(days: 4)), 0.5, 0.8, 0.4),
+      (now.subtract(const Duration(days: 3)), 0.8, 0.7, 0.7),
+      (now.subtract(const Duration(days: 2)), 0.6, 0.5, 0.6),
+      (now.subtract(const Duration(days: 1)), 0.9, 0.8, 0.8),
+      (now, 0.7, 0.7, 0.7),
+    ];
+
+    // Insert diary entries
+    for (final entry in diaryData) {
+      await diaryRepo.add(
+        userId: user.id,
+        title: entry.$2,
+        content: entry.$3,
+        createdAt: entry.$1,
+      );
+    }
+
+    // Insert check-ins
+    for (final checkIn in checkInData) {
+      await checkInRepo.save(
+        userId: user.id,
+        moodLevel: checkIn.$2,
+        sleepQuality: checkIn.$3,
+        energyLevel: checkIn.$4,
+        date: checkIn.$1,
+      );
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Test data added! Check your diary and dashboard.'),
+          backgroundColor: Color(0xFF13EC5B),
+        ),
+      );
+    }
   }
 
   @override
@@ -293,6 +376,27 @@ class _SettingsPageState extends State<SettingsPage> {
                                   color: Colors.redAccent,
                                   fontWeight: FontWeight.w900,
                                 ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+                            const Divider(color: borderGreen),
+                            const SizedBox(height: 10),
+
+                            Text(
+                              'Developer Options',
+                              style: TextStyle(color: textMuted, fontSize: 12),
+                            ),
+                            const SizedBox(height: 10),
+                            OutlinedButton.icon(
+                              onPressed: _seedTestData,
+                              icon: const Icon(Icons.science, color: primary),
+                              label: const Text(
+                                'Add Test Data',
+                                style: TextStyle(color: primary),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: borderGreen),
                               ),
                             ),
                           ],

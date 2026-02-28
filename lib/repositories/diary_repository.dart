@@ -30,13 +30,14 @@ class DiaryRepository {
     required int userId,
     required String title,
     required String content,
+    DateTime? createdAt,
   }) async {
     final db = await _database.db;
     await db.insert('diary_entries', {
       'user_id': userId,
       'title': title.trim().isEmpty ? 'Untitled' : title.trim(),
       'content': content.trim(),
-      'created_at': DateTime.now().toIso8601String(),
+      'created_at': (createdAt ?? DateTime.now()).toIso8601String(),
     });
   }
 

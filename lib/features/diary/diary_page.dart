@@ -121,6 +121,11 @@ class _DiaryPageState extends State<DiaryPage> {
                                   ),
                                 ),
                                 IconButton(
+                                  tooltip: 'Edit',
+                                  onPressed: () => _openEditEntrySheet(e),
+                                  icon: const Icon(Icons.edit, color: primary),
+                                ),
+                                IconButton(
                                   tooltip: 'Delete',
                                   onPressed: () => _confirmDelete(e),
                                   icon: const Icon(
@@ -273,16 +278,6 @@ class _DiaryPageState extends State<DiaryPage> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(dialogCtx).pop();
-              _openEditEntrySheet(e);
-            },
-            child: const Text(
-              'Edit',
-              style: TextStyle(color: textMuted, fontWeight: FontWeight.w900),
-            ),
-          ),
           TextButton(
             onPressed: () => Navigator.of(dialogCtx).pop(),
             child: const Text(

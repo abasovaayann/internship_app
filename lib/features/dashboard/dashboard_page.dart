@@ -462,6 +462,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       'SAT',
                       'SUN',
                     ],
+                    todayIndex: DateTime.now().weekday - 1,
                   ),
                 ],
               ),
@@ -657,14 +658,20 @@ class _MetricRow extends StatelessWidget {
 }
 
 class _TrendsCard extends StatelessWidget {
-  const _TrendsCard({required this.values, required this.labels});
+  const _TrendsCard({
+    required this.values,
+    required this.labels,
+    required this.todayIndex,
+  });
   final List<double> values; // 0..1
   final List<String> labels;
+  final int todayIndex; // 0 = Monday, 6 = Sunday
 
   static const primary = Color(0xFF13EC5B);
   static const surfaceDark = Color(0xFF1A2E22);
   static const borderGreen = Color(0xFF326744);
   static const textMuted = Color(0xFF92C9A4);
+  static const highlightColor = Color(0xFFFFD700); // Gold for today
 
   @override
   Widget build(BuildContext context) {
@@ -680,7 +687,7 @@ class _TrendsCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: List.generate(values.length, (i) {
-          final isBest = values[i] == values.reduce((a, b) => a > b ? a : b);
+          final isToday = i == todayIndex;
           final h = (values[i].clamp(0.0, 1.0)) * maxH;
 
           return Expanded(
@@ -694,13 +701,16 @@ class _TrendsCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: borderGreen.withOpacity(0.22),
                       borderRadius: BorderRadius.circular(14),
+                      border: isToday
+                          ? Border.all(color: highlightColor, width: 2)
+                          : null,
                     ),
                     alignment: Alignment.bottomCenter,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       height: h,
                       decoration: BoxDecoration(
-                        color: isBest ? primary : primary.withOpacity(0.45),
+                        color: isToday ? primary : primary.withOpacity(0.45),
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
@@ -709,7 +719,7 @@ class _TrendsCard extends StatelessWidget {
                   Text(
                     labels[i],
                     style: TextStyle(
-                      color: isBest ? primary : textMuted,
+                      color: isToday ? highlightColor : textMuted,
                       fontWeight: FontWeight.w900,
                       fontSize: 10,
                     ),
